@@ -8,7 +8,9 @@
 
 #import "CTCheckbox.h"
 
-static const float CTCheckboxDefaultSideLength = 20.0;
+static const CGFloat CTCheckboxDefaultSideLength = 20.0;
+static const CGFloat CTCheckboxDefaultBorderWidth = 1.0;
+static const CGFloat CTCheckboxDefaultCornerRadius = 0.0;
 
 @interface CTCheckbox ()
 @property (nonatomic, strong) NSMutableDictionary *colorDictionary;
@@ -39,8 +41,11 @@ static const float CTCheckboxDefaultSideLength = 20.0;
 {
     self.colorDictionary = [NSMutableDictionary dictionary];
     self.backgroundColorDictionary = [NSMutableDictionary dictionary];
-
+    
     self.checkboxSideLength = CTCheckboxDefaultSideLength;
+    self.checkboxBorderWidth = CTCheckboxDefaultBorderWidth;
+    self.checkboxCornerRadius = CTCheckboxDefaultCornerRadius;
+    
     self.checkboxColor = [UIColor blackColor];
     self.backgroundColor = [UIColor clearColor];
     self.textLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -171,8 +176,8 @@ static const float CTCheckboxDefaultSideLength = 20.0;
         [bezierPath fill];
     }
 
-    UIBezierPath *roundedRectanglePath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(CGRectGetMinX(frame) + floor(CGRectGetWidth(frame) * 0.05000 + 0.5), CGRectGetMinY(frame) + floor(CGRectGetHeight(frame) * 0.05000 + 0.5), floor(CGRectGetWidth(frame) * 0.95000 + 0.5) - floor(CGRectGetWidth(frame) * 0.05000 + 0.5), floor(CGRectGetHeight(frame) * 0.95000 + 0.5) - floor(CGRectGetHeight(frame) * 0.05000 + 0.5)) cornerRadius:4];
-    roundedRectanglePath.lineWidth = 2 * self.checkboxSideLength / CTCheckboxDefaultSideLength;
+    UIBezierPath *roundedRectanglePath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(CGRectGetMinX(frame) + floor(CGRectGetWidth(frame) * 0.05000 + 0.5), CGRectGetMinY(frame) + floor(CGRectGetHeight(frame) * 0.05000 + 0.5), floor(CGRectGetWidth(frame) * 0.95000 + 0.5) - floor(CGRectGetWidth(frame) * 0.05000 + 0.5), floor(CGRectGetHeight(frame) * 0.95000 + 0.5) - floor(CGRectGetHeight(frame) * 0.05000 + 0.5)) cornerRadius:self.checkboxCornerRadius];
+    roundedRectanglePath.lineWidth = self.checkboxBorderWidth;
     [self.checkboxColor setStroke];
     [roundedRectanglePath stroke];
 }
@@ -182,13 +187,18 @@ static const float CTCheckboxDefaultSideLength = 20.0;
     [super layoutSubviews];
 
     CGFloat textLabelOriginX = self.checkboxSideLength + 5.0;
-    CGSize textLabelMaxSize = CGSizeMake(CGRectGetWidth(self.bounds) - textLabelOriginX, CGRectGetHeight(self.bounds));
+//    CGSize textLabelMaxSize = CGSizeMake(CGRectGetWidth(self.bounds) - textLabelOriginX, CGRectGetHeight(self.bounds));
 
     CGSize textLabelSize;
     if ([[[UIDevice currentDevice] systemVersion] compare:@"7.0" options:NSNumericSearch] != NSOrderedAscending) {
         textLabelSize = [self.textLabel.text sizeWithAttributes:@{NSFontAttributeName : self.textLabel.font}];
     } else {
-        textLabelSize = [self.textLabel.text sizeWithFont:self.textLabel.font constrainedToSize:textLabelMaxSize lineBreakMode:self.textLabel.lineBreakMode];
+        CGRect rect = [self.textLabel.text boundingRectWithSize:self.textLabel.frame.size
+                                                        options:NSStringDrawingUsesLineFragmentOrigin
+                                                     attributes:@{NSFontAttributeName:self.textLabel.font}
+                                                        context:nil];
+        textLabelSize = rect.size;
+//        textLabelSize = [self.textLabel.text sizeWithFont:self.textLabel.font constrainedToSize:textLabelMaxSize lineBreakMode:self.textLabel.lineBreakMode];
     }
 
     self.textLabel.frame = CGRectIntegral(CGRectMake(textLabelOriginX, (CGRectGetHeight(self.bounds) - textLabelSize.height) / 2.0, textLabelSize.width, textLabelSize.height));

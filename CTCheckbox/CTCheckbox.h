@@ -11,10 +11,12 @@
 
 @interface CTCheckbox : UIControl
 
-@property (nonatomic) BOOL checked;
+@property (nonatomic, assign) BOOL checked;
 @property (nonatomic, strong) UIColor *checkboxColor;
-@property (nonatomic) float checkboxSideLength;
+@property (nonatomic, assign) CGFloat checkboxSideLength;
 @property (nonatomic, strong) UILabel *textLabel;
+@property (nonatomic, assign) CGFloat checkboxBorderWidth;
+@property (nonatomic, assign) CGFloat checkboxCornerRadius;
 
 - (void)setColor:(UIColor *)color forControlState:(UIControlState)state;
 
